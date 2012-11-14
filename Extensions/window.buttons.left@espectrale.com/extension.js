@@ -14,6 +14,7 @@
         * [live.gnome.org Extensions](https://live.gnome.org/GnomeShell/Extensions)
         * [live.gnome.org Getting Started development](https://live.gnome.org/GnomeShell/Development)
         * [Updating GNOME Shell Extensions To Work With GNOME 3.2](http://blog.fpmurphy.com/2011/11/updating-gnome-shell-extensions-to-work-with-gnome-3-2.html)
+        * [Requirements and tips for getting your GNOME Shell Extension approved](http://blog.mecheye.net/2012/02/requirements-and-tips-for-getting-your-gnome-shell-extension-approved/)
         * [GIO Reference Manual](http://developer.gnome.org/gio/stable/)
         * [St Reference Manual](http://developer.gnome.org/st/stable/)
         * [Clutter Reference Manual](http://developer.gnome.org/clutter/1.12/)
