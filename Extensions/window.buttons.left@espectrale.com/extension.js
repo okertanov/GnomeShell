@@ -47,7 +47,7 @@ var WindowButtonsLeft = new Lang.Class({
     Label: null,
     _init: function()
     {
-        log(EXTENSION, ':', 'Inside WindowButtonsLeft::_init()');
+        log(EXTENSION + ': ' + 'Inside WindowButtonsLeft::_init()');
     },
     _showHint: function(txt)
     {
@@ -114,7 +114,7 @@ var WindowButtonsLeft = new Lang.Class({
     },
     enable: function()
     {
-        log(EXTENSION, ':', 'Inside WindowButtonsLeft::enable()');
+        log(EXTENSION + ': ' + 'Inside WindowButtonsLeft::enable()');
         try
         {
             this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
@@ -127,7 +127,7 @@ var WindowButtonsLeft = new Lang.Class({
     },
     disable: function()
     {
-        log(EXTENSION, ':', 'Inside WindowButtonsLeft::disable()');
+        log(EXTENSION + ': ' + 'Inside WindowButtonsLeft::disable()');
         try
         {
             this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
@@ -145,7 +145,7 @@ var WindowButtonsLeft = new Lang.Class({
 */
 function init()
 {
-    log(EXTENSION, ':', 'Inside init()');
+    log(EXTENSION + ': ' + 'Inside init()');
     return new WindowButtonsLeft();
 }
 
