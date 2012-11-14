@@ -1,7 +1,10 @@
 /*
     Copyright (C) 2012 Oleg Kertanov <okertanov@gmail.com>
+
     Created with
         `gnome-shell-extension-tool --create-extension`
+
+    License: see GPLv2.txt file
 
     See also:
         * dconf-editor
@@ -33,41 +36,73 @@ const CFG_BUTTON_LAYOUT_KEY  = 'button-layout';
 const CFG_BUTTON_LAYOUT_VAL_LTR_FULL = 'close,minimize,maximize:';
 const CFG_BUTTON_LAYOUT_VAL_RTL_FULL = ':minimize,maximize,close';
 
-var WindowButtons = function()
+/*
+    WindowButtonsLeft class
+*/
+var WindowButtonsLeft = function()
 {
     return {
         text: null,
-        showText: function(txt)
+        showHint: function(txt)
         {
-            if (!this.text)
+            if ( !this.text )
             {
-                this.text = new St.Label({ style_class: 'helloworld-label', text: txt });
+                this.text = new St.Label({ style_class: 'show-hint-label', text: txt });
+                this.text.opacity = 255;
                 Main.uiGroup.add_actor(this.text);
             }
 
-            this.text.opacity = 255;
+            let ( monitor = Main.layoutManager.primaryMonitor,
+                  x = Math.floor(monitor.width - this.text.width * 2),
+                  y = Math.floor(monitor.height / 5 - this.text.height / 2) )
+            {
+                this.text.set_position(x, y);
+            }
+        },
+        hideHint: function()
+        {
+        },
+        getButtonLayoutString: function()
+        {
+            var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH}),
+                buttonLayout = overridesBranch.get_string(CFG_BUTTON_LAYOUT_KEY);
 
-            let monitor = Main.layoutManager.primaryMonitor;
+            return buttonLayout;
+        },
+        setButtonLayoutString: function(str)
+        {
+            var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH});
 
-            this.text.set_position(Math.floor(monitor.width / 2 - this.text.width / 2),
-                                   Math.floor(monitor.height / 5 - this.text.height / 2));
+            if ( overridesBranch.is_writable(CFG_BUTTON_LAYOUT_KEY) )
+            {
+                if ( overridesBranch.set_string(str) )
+                {
+                    Gio.Settings.sync();
+                }
+            }
         },
         enable: function()
         {
             global.log('Extension:', 'enable()');
-            this.showText('Hello, Gnome Shell.');
+            this.setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
+            this.showHint('Extension enabled.');
         },
         disable: function()
         {
             global.log('Extension:', 'disable()');
+            this.setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
+            this.hideHint();
         }
     };
 };
 
+/*
+    Extension initialization
+*/
 function init()
 {
     global.log('Extension:', 'init()');
 
-    return new WindowButtons();
+    return new WindowButtonsLeft();
 }
 
