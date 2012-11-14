@@ -71,8 +71,17 @@ var WindowButtonsLeft = new Lang.Class({
     },
     _getButtonLayoutString: function()
     {
-        var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH}),
+        var buttonLayout = null,
+            overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH});
+
+        if ( overridesBranch )
+        {
             buttonLayout = overridesBranch.get_string(CFG_BUTTON_LAYOUT_KEY);
+        }
+        else
+        {
+            throw new Error('Can\'t get button layout settings.');
+        }
 
         return buttonLayout;
     },
@@ -100,7 +109,7 @@ var WindowButtonsLeft = new Lang.Class({
     {
         let ( details = (e.message || 'Unknown exception.') )
         {
-                Main.notifyError('Error:', details);
+            Main.notifyError('Error:', details);
         }
     },
     enable: function()
