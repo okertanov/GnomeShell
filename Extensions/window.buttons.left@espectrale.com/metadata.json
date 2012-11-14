@@ -2,12 +2,13 @@
     "uuid": "window.buttons.left@espectrale.com",
     "name": "Move Window Buttons to the Left",
     "description": "Move Window Buttons to the Left side of a Window's decoration.",
-    "url:": "http://www.espectrale.com/gnome-shell",
+    "url:": "https://github.com/okertanov/GnomeShell",
+    "original-author": "okertanov@gmail.com",
     "shell-version":
     [
         "3.4",
         "3.6",
         "3.8"
     ],
-    "version": 2
+    "version": 3
 }

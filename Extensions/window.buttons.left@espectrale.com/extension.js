@@ -53,21 +53,29 @@ var WindowButtonsLeft = new Lang.Class({
     {
         if ( !this.Label )
         {
-            this.Label = new St.Label({ style_class: 'show-hint-label', text: txt });
-            this.Label.opacity = 255;
-            Main.uiGroup.add_actor(this.Label);
+            this.Label = new St.Label({ style_class: 'show-hint-label',
+                                        text: txt });
         }
 
-        let ( monitor = Main.layoutManager.primaryMonitor,
-              x = Math.floor(monitor.width - this.Label.width * 2),
-              y = Math.floor(monitor.height / 5 - this.Label.height / 2) )
+        let (monitor = Main.layoutManager.primaryMonitor)
         {
-            this.Label.set_position(x, y);
+            let ( x = Math.floor(monitor.width / 2 - this.Label.width / 2 ),
+                  y = Math.floor(monitor.height / 2 - this.Label.height / 2) )
+            {
+                if ( this.Label )
+                {
+                    Main.uiGroup.add_actor(this.Label);
+                    this.Label.opacity = 255;
+                    this.Label.set_position(x, y);
+                }
+            }
         }
     },
     _hideHint: function()
     {
+        Main.uiGroup.remove_actor(this.Label);
         this.Label.destroy();
+        this.Label = null;
     },
     _getButtonLayoutString: function()
     {
@@ -91,7 +99,7 @@ var WindowButtonsLeft = new Lang.Class({
 
         if ( overridesBranch.is_writable(CFG_BUTTON_LAYOUT_KEY) )
         {
-            if ( overridesBranch.set_string(str) )
+            if ( overridesBranch.set_string(CFG_BUTTON_LAYOUT_KEY, str) )
             {
                 Gio.Settings.sync();
             }
@@ -112,13 +120,20 @@ var WindowButtonsLeft = new Lang.Class({
             Main.notifyError('Error:', details);
         }
     },
+    _handleInfo: function(i)
+    {
+        Main.notify('Info:', i);
+    },
     enable: function()
     {
         log(EXTENSION + ': ' + 'Inside WindowButtonsLeft::enable()');
         try
         {
-            this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
-            this._showHint(EXTENSION + ' ' + 'extension enabled.');
+            let ( msg = EXTENSION + ' ' + 'extension enabled.' )
+            {
+                this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
+                this._handleInfo(msg);
+            }
         }
         catch(e)
         {
@@ -130,8 +145,11 @@ var WindowButtonsLeft = new Lang.Class({
         log(EXTENSION + ': ' + 'Inside WindowButtonsLeft::disable()');
         try
         {
-            this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
-            this._hideHint();
+            let ( msg = EXTENSION + ' ' + 'extension disabled.' )
+            {
+                this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
+                this._handleInfo(msg);
+            }
         }
         catch(e)
         {
