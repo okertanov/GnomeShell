@@ -23,14 +23,16 @@
 /*
     Modules
 */
-const Lang  =   imports.lang;
-const Main  =   imports.ui.main;
-const St    =   imports.gi.St;
-const Gio   =   imports.gi.Gio;
+const Lang      =   imports.lang;
+const Main      =   imports.ui.main;
+const St        =   imports.gi.St;
+const Gio       =   imports.gi.Gio;
+const Mainloop  =   imports.mainloop;
 
 /*
     Constants
 */
+const EXTENSION = 'window.buttons.left@espectrale.com';
 const CFG_BUTTON_LAYOUT_PATH = 'org.gnome.shell.overrides';
 const CFG_BUTTON_LAYOUT_KEY  = 'button-layout';
 const CFG_BUTTON_LAYOUT_VAL_LTR_FULL = 'close,minimize,maximize:';
@@ -39,70 +41,101 @@ const CFG_BUTTON_LAYOUT_VAL_RTL_FULL = ':minimize,maximize,close';
 /*
     WindowButtonsLeft class
 */
-var WindowButtonsLeft = function()
-{
-    return {
-        text: null,
-        showHint: function(txt)
+var WindowButtonsLeft = new Lang.Class({
+    Name: 'WindowButtonsLeft',
+    Label: null,
+    _init: function()
+    {
+        log(EXTENSION, ':', 'Inside WindowButtonsLeft::_init()');
+    },
+    _showHint: function(txt)
+    {
+        if ( !this.Label )
         {
-            if ( !this.text )
-            {
-                this.text = new St.Label({ style_class: 'show-hint-label', text: txt });
-                this.text.opacity = 255;
-                Main.uiGroup.add_actor(this.text);
-            }
-
-            let ( monitor = Main.layoutManager.primaryMonitor,
-                  x = Math.floor(monitor.width - this.text.width * 2),
-                  y = Math.floor(monitor.height / 5 - this.text.height / 2) )
-            {
-                this.text.set_position(x, y);
-            }
-        },
-        hideHint: function()
-        {
-        },
-        getButtonLayoutString: function()
-        {
-            var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH}),
-                buttonLayout = overridesBranch.get_string(CFG_BUTTON_LAYOUT_KEY);
-
-            return buttonLayout;
-        },
-        setButtonLayoutString: function(str)
-        {
-            var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH});
-
-            if ( overridesBranch.is_writable(CFG_BUTTON_LAYOUT_KEY) )
-            {
-                if ( overridesBranch.set_string(str) )
-                {
-                    Gio.Settings.sync();
-                }
-            }
-        },
-        enable: function()
-        {
-            global.log('Extension:', 'enable()');
-            this.setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
-            this.showHint('Extension enabled.');
-        },
-        disable: function()
-        {
-            global.log('Extension:', 'disable()');
-            this.setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
-            this.hideHint();
+            this.Label = new St.Label({ style_class: 'show-hint-label', text: txt });
+            this.Label.opacity = 255;
+            Main.uiGroup.add_actor(this.Label);
         }
-    };
-};
+
+        let ( monitor = Main.layoutManager.primaryMonitor,
+              x = Math.floor(monitor.width - this.Label.width * 2),
+              y = Math.floor(monitor.height / 5 - this.Label.height / 2) )
+        {
+            this.Label.set_position(x, y);
+        }
+    },
+    _hideHint: function()
+    {
+        this.Label.destroy();
+    },
+    _getButtonLayoutString: function()
+    {
+        var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH}),
+            buttonLayout = overridesBranch.get_string(CFG_BUTTON_LAYOUT_KEY);
+
+        return buttonLayout;
+    },
+    _setButtonLayoutString: function(str)
+    {
+        var overridesBranch = new Gio.Settings({schema: CFG_BUTTON_LAYOUT_PATH});
+
+        if ( overridesBranch.is_writable(CFG_BUTTON_LAYOUT_KEY) )
+        {
+            if ( overridesBranch.set_string(str) )
+            {
+                Gio.Settings.sync();
+            }
+            else
+            {
+                throw new Error('Can\'t set button layout settings.');
+            }
+        }
+        else
+        {
+            throw new Error('Can\'t write button layout settings.');
+        }
+    },
+    _handleException: function(e)
+    {
+        let ( details = (e.message || 'Unknown exception.') )
+        {
+                Main.notifyError('Error:', details);
+        }
+    },
+    enable: function()
+    {
+        log(EXTENSION, ':', 'Inside WindowButtonsLeft::enable()');
+        try
+        {
+            this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_LTR_FULL);
+            this._showHint(EXTENSION + ' ' + 'extension enabled.');
+        }
+        catch(e)
+        {
+            this._handleException(e);
+        }
+    },
+    disable: function()
+    {
+        log(EXTENSION, ':', 'Inside WindowButtonsLeft::disable()');
+        try
+        {
+            this._setButtonLayoutString(CFG_BUTTON_LAYOUT_VAL_RTL_FULL);
+            this._hideHint();
+        }
+        catch(e)
+        {
+            this._handleException(e);
+        }
+    }
+});
 
 /*
     Extension initialization
 */
 function init()
 {
-    global.log('Extension:', 'init()');
-
+    log(EXTENSION, ':', 'Inside init()');
     return new WindowButtonsLeft();
 }
 
